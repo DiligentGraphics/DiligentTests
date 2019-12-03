@@ -1,0 +1,43 @@
+version: '2.4.{build}'
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+image:
+- Visual Studio 2017
+
+environment:
+  matrix:
+    - platform: x64
+      configuration: Debug
+
+    - platform: x64
+      configuration: Release
+
+# clone directory
+clone_folder: c:\projects\DiligentTests
+
+install:
+  # clone submodules
+  - git submodule update --init --recursive
+  - git clone https://github.com/DiligentGraphics/DiligentCore.git ../DiligentCore --recursive
+  - ..\DiligentCore\BuildTools\Scripts\appveyor\install.bat
+
+before_build:
+  #- cd c:\projects\DiligentTests\BuildTools\FormatValidation
+  #- validate_format_win.bat
+  - cd c:\projects
+  - echo cmake_minimum_required(VERSION 3.6) > CMakeLists.txt
+  - echo Project(DiligentEngineTests) >> CMakeLists.txt
+  #- echo add_subdirectory(DiligentCore) >> CMakeLists.txt
+  - echo add_subdirectory(DiligentTests) >> CMakeLists.txt
+  - echo %PLATFORM%
+  - cmake -S . -B ./build -G "Visual Studio 15 2017" -A %PLATFORM%
+
+build:
+  project: c:\projects\build\DiligentEngineTests.sln
+  verbosity: minimal
+  parallel: true
