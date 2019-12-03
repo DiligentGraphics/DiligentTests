@@ -48,7 +48,7 @@ script:
   - |
     echo "cmake_minimum_required(VERSION 3.6)" > CMakeLists.txt
     echo "Project(DiligentEngineTest)" >> CMakeLists.txt
-   #echo "add_subdirectory(DiligentCore)" >> CMakeLists.txt
+   # echo "add_subdirectory(DiligentCore)" >> CMakeLists.txt
     echo "add_subdirectory(DiligentTests)" >> CMakeLists.txt
   - . ./DiligentCore/BuildTools/Scripts/travis/build.sh
 
