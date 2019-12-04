@@ -41,3 +41,6 @@ build:
   project: c:\projects\build\DiligentEngineTests.sln
   verbosity: minimal
   parallel: true
+
+test_script:
+    c:\projects\build\DiligentEngineTests\%configuration%\DiligentCore_Tests.exe
