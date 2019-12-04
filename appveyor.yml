@@ -43,4 +43,4 @@ build:
   parallel: true
 
 test_script:
-    c:\projects\build\DiligentEngineTests\%configuration%\DiligentCore_Tests.exe
+    c:\projects\build\DiligentEngineTests\%CONFIGURATION%\DiligentCore_Tests.exe
