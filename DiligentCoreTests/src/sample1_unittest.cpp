@@ -72,6 +72,7 @@ public:
             std::cout << "Successfully created DXGI Factory\n";
         }
         CComPtr<IDXGIAdapter1> pDXIAdapter;
+        CComPtr<IDXGIAdapter1> pWarpAdapter;
 
         auto d3dFeatureLevel = D3D_FEATURE_LEVEL_11_0;
         UINT adapter = 0;
@@ -97,23 +98,49 @@ public:
             bool IsCompatibleAdapter = SUCCEEDED(hr);
             if (IsCompatibleAdapter)
             {
-                DXGIAdapters.emplace_back(std::move(pDXIAdapter));
+                DXGIAdapters.emplace_back(pDXIAdapter);
+            }
+            if (AdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+            {
+                pWarpAdapter = pDXIAdapter;
             }
         }
 
         CComPtr<ID3D11Device> pDevice;
-        auto hr = D3D11CreateDevice(
-            nullptr,
-            D3D_DRIVER_TYPE_WARP, // There is no need to create a real hardware device.
-            0,
-            0,                 // Flags.
-            &d3dFeatureLevel,     // Feature levels.
-            1,                 // Number of feature levels
-            D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
-            &pDevice,          
-            nullptr,           // Feature level of the created adapter.
-            nullptr            // No need to keep the D3D device context reference.
-        );
+        HRESULT hr;
+        if (pWarpAdapter)
+        {
+            std::cout << "Using SW adapter " << pWarpAdapter << "\n";
+            hr = D3D11CreateDevice(
+                pWarpAdapter,
+                D3D_DRIVER_TYPE_UNKNOWN, // There is no need to create a real hardware device.
+                0,
+                0,                 // Flags.
+                &d3dFeatureLevel,     // Feature levels.
+                1,                 // Number of feature levels
+                D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
+                &pDevice,          
+                nullptr,           // Feature level of the created adapter.
+                nullptr            // No need to keep the D3D device context reference.
+            );
+        }
+        else
+        {
+            std::cout << "Creating D3D_DRIVER_TYPE_WARP adapter\n";
+            hr = D3D11CreateDevice(
+                nullptr,
+                D3D_DRIVER_TYPE_WARP, // There is no need to create a real hardware device.
+                0,
+                0,                 // Flags.
+                &d3dFeatureLevel,     // Feature levels.
+                1,                 // Number of feature levels
+                D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
+                &pDevice,          
+                nullptr,           // Feature level of the created adapter.
+                nullptr            // No need to keep the D3D device context reference.
+            );
+        }
+
         if (SUCCEEDED(hr))
         {
             std::cout << "Successfully created WARP adapter!\n";
