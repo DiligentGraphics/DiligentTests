@@ -10,7 +10,9 @@ add_executable(DiligentCore_Tests ${SOURCE} ${INCLUDE})
 target_link_libraries(DiligentCore_Tests PRIVATE gtest_main)
 target_include_directories(DiligentCore_Tests PRIVATE include)
 #target_compile_options(DiligentCore_Tests PRIVATE "/MT$<$<CONFIG:Debug>:d>")
-
+if(WIN32)
+    target_link_libraries(DiligentCore_Tests PRIVATE d3d11.lib d3d12.lib dxgi.lib)
+endif()
 #set_common_target_properites(DiligentCore_Tests)
 set_target_properties(DiligentCore_Tests PROPERTIES
     CXX_VISIBILITY_PRESET hidden # -fvisibility=hidden

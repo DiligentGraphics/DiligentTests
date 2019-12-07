@@ -39,103 +39,206 @@
 // test logic needs is declared.
 //
 // Don't forget gtest.h, which declares the testing framework.
+#include <iostream>
+#include <vector>
+
+#ifdef WIN32
+#   include <Windows.h>
+#   include <dxgi1_2.h>
+#   include <atlcomcli.h>
+#   include <d3d11.h>
+
+class Direct3DTest
+{
+public:
+    Direct3DTest()
+    {
+        std::cout << "Initializing Direct3D...\n";
+        FindCompatibleAdapters();
+    }
+
+    std::vector<CComPtr<IDXGIAdapter1>> FindCompatibleAdapters()
+    {
+        std::vector<CComPtr<IDXGIAdapter1>> DXGIAdapters;
+
+        CComPtr<IDXGIFactory2> pFactory;
+        if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&pFactory)))
+        {
+            std::cout << "Failed to create DXGI Factory";
+            return std::move(DXGIAdapters);
+        }
+        else
+        {
+            std::cout << "Successfully created DXGI Factory\n";
+        }
+        CComPtr<IDXGIAdapter1> pDXIAdapter;
+
+        auto d3dFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+        UINT adapter = 0;
+        for (; pFactory->EnumAdapters1(adapter, &pDXIAdapter) != DXGI_ERROR_NOT_FOUND; ++adapter, pDXIAdapter.Release())
+        {
+            DXGI_ADAPTER_DESC1 AdapterDesc;
+            pDXIAdapter->GetDesc1(&AdapterDesc);
+            char DescriptionMB[_countof(AdapterDesc.Description)];
+            WideCharToMultiByte(CP_ACP, 0, AdapterDesc.Description, -1, DescriptionMB, _countof(DescriptionMB), NULL, FALSE);
+            std::cout << "Found adapter '" << DescriptionMB << "' (" << AdapterDesc.DedicatedVideoMemory / (1<<20) << ") MB\n";
+            auto hr = D3D11CreateDevice(
+                nullptr,
+                D3D_DRIVER_TYPE_NULL, // There is no need to create a real hardware device.
+                0,
+                0,                 // Flags.
+                &d3dFeatureLevel,     // Feature levels.
+                1,                 // Number of feature levels
+                D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
+                nullptr,           // No need to keep the D3D device reference.
+                nullptr,           // Feature level of the created adapter.
+                nullptr            // No need to keep the D3D device context reference.
+            );
+            bool IsCompatibleAdapter = SUCCEEDED(hr);
+            if (IsCompatibleAdapter)
+            {
+                DXGIAdapters.emplace_back(std::move(pDXIAdapter));
+            }
+        }
+
+        CComPtr<ID3D11Device> pDevice;
+        auto hr = D3D11CreateDevice(
+            nullptr,
+            D3D_DRIVER_TYPE_WARP, // There is no need to create a real hardware device.
+            0,
+            0,                 // Flags.
+            &d3dFeatureLevel,     // Feature levels.
+            1,                 // Number of feature levels
+            D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
+            &pDevice,          
+            nullptr,           // Feature level of the created adapter.
+            nullptr            // No need to keep the D3D device context reference.
+        );
+        if (SUCCEEDED(hr))
+        {
+            std::cout << "Successfully created WARP adapter!\n";
+            auto FL = pDevice->GetFeatureLevel();
+            std::cout << "Device feature level: ";
+            switch(FL)
+            {
+                case D3D_FEATURE_LEVEL_10_0: std::cout << "10_0"; break;
+                case D3D_FEATURE_LEVEL_10_1: std::cout << "10_1"; break;
+                case D3D_FEATURE_LEVEL_11_0: std::cout << "11_0"; break;
+                case D3D_FEATURE_LEVEL_11_1: std::cout << "11_1"; break;
+                case D3D_FEATURE_LEVEL_12_0: std::cout << "12_0"; break;
+                case D3D_FEATURE_LEVEL_12_1: std::cout << "12_1"; break;
+            }
+            std::cout << "\n";
+        }
+        else
+        {
+            std::cout << "Unable to create WARP adapter :(\n";
+        }
+
+        return std::move(DXGIAdapters);
+    }
+
+    static Direct3DTest g_D3DTest;
+};
+Direct3DTest Direct3DTest::g_D3DTest;
+#endif
 
 #include <limits.h>
 #include "sample1.h"
 #include "gtest/gtest.h"
 namespace {
 
-// Step 2. Use the TEST macro to define your tests.
-//
-// TEST has two parameters: the test case name and the test name.
-// After using the macro, you should define your test logic between a
-// pair of braces.  You can use a bunch of macros to indicate the
-// success or failure of a test.  EXPECT_TRUE and EXPECT_EQ are
-// examples of such macros.  For a complete list, see gtest.h.
-//
-// <TechnicalDetails>
-//
-// In Google Test, tests are grouped into test cases.  This is how we
-// keep test code organized.  You should put logically related tests
-// into the same test case.
-//
-// The test case name and the test name should both be valid C++
-// identifiers.  And you should not use underscore (_) in the names.
-//
-// Google Test guarantees that each test you define is run exactly
-// once, but it makes no guarantee on the order the tests are
-// executed.  Therefore, you should write your tests in such a way
-// that their results don't depend on their order.
-//
-// </TechnicalDetails>
+    // Step 2. Use the TEST macro to define your tests.
+    //
+    // TEST has two parameters: the test case name and the test name.
+    // After using the macro, you should define your test logic between a
+    // pair of braces.  You can use a bunch of macros to indicate the
+    // success or failure of a test.  EXPECT_TRUE and EXPECT_EQ are
+    // examples of such macros.  For a complete list, see gtest.h.
+    //
+    // <TechnicalDetails>
+    //
+    // In Google Test, tests are grouped into test cases.  This is how we
+    // keep test code organized.  You should put logically related tests
+    // into the same test case.
+    //
+    // The test case name and the test name should both be valid C++
+    // identifiers.  And you should not use underscore (_) in the names.
+    //
+    // Google Test guarantees that each test you define is run exactly
+    // once, but it makes no guarantee on the order the tests are
+    // executed.  Therefore, you should write your tests in such a way
+    // that their results don't depend on their order.
+    //
+    // </TechnicalDetails>
 
 
-// Tests Factorial().
+    // Tests Factorial().
 
-// Tests factorial of negative numbers.
-TEST(FactorialTest, Negative) {
-  // This test is named "Negative", and belongs to the "FactorialTest"
-  // test case.
-  EXPECT_EQ(1, Factorial(-5));
-  EXPECT_EQ(1, Factorial(-1));
-  EXPECT_GT(Factorial(-10), 0);
+    // Tests factorial of negative numbers.
+    TEST(FactorialTest, Negative) {
+        // This test is named "Negative", and belongs to the "FactorialTest"
+        // test case.
+        EXPECT_EQ(1, Factorial(-5));
+        EXPECT_EQ(1, Factorial(-1));
+        EXPECT_GT(Factorial(-10), 0);
 
-  // <TechnicalDetails>
-  //
-  // EXPECT_EQ(expected, actual) is the same as
-  //
-  //   EXPECT_TRUE((expected) == (actual))
-  //
-  // except that it will print both the expected value and the actual
-  // value when the assertion fails.  This is very helpful for
-  // debugging.  Therefore in this case EXPECT_EQ is preferred.
-  //
-  // On the other hand, EXPECT_TRUE accepts any Boolean expression,
-  // and is thus more general.
-  //
-  // </TechnicalDetails>
-}
+        // <TechnicalDetails>
+        //
+        // EXPECT_EQ(expected, actual) is the same as
+        //
+        //   EXPECT_TRUE((expected) == (actual))
+        //
+        // except that it will print both the expected value and the actual
+        // value when the assertion fails.  This is very helpful for
+        // debugging.  Therefore in this case EXPECT_EQ is preferred.
+        //
+        // On the other hand, EXPECT_TRUE accepts any Boolean expression,
+        // and is thus more general.
+        //
+        // </TechnicalDetails>
+    }
 
-// Tests factorial of 0.
-TEST(FactorialTest, Zero) {
-  EXPECT_EQ(1, Factorial(0));
-}
+    // Tests factorial of 0.
+    TEST(FactorialTest, Zero) {
+        EXPECT_EQ(1, Factorial(0));
+    }
 
-// Tests factorial of positive numbers.
-TEST(FactorialTest, Positive) {
-  EXPECT_EQ(1, Factorial(1));
-  EXPECT_EQ(2, Factorial(2));
-  EXPECT_EQ(6, Factorial(3));
-  EXPECT_EQ(40320, Factorial(8));
-}
+    // Tests factorial of positive numbers.
+    TEST(FactorialTest, Positive) {
+        EXPECT_EQ(1, Factorial(1));
+        EXPECT_EQ(2, Factorial(2));
+        EXPECT_EQ(6, Factorial(3));
+        EXPECT_EQ(40320, Factorial(8));
+    }
 
 
-// Tests IsPrime()
+    // Tests IsPrime()
 
-// Tests negative input.
-TEST(IsPrimeTest, Negative) {
-  // This test belongs to the IsPrimeTest test case.
+    // Tests negative input.
+    TEST(IsPrimeTest, Negative) {
+        // This test belongs to the IsPrimeTest test case.
 
-  EXPECT_FALSE(IsPrime(-1));
-  EXPECT_FALSE(IsPrime(-2));
-  EXPECT_FALSE(IsPrime(INT_MIN));
-}
+        EXPECT_FALSE(IsPrime(-1));
+        EXPECT_FALSE(IsPrime(-2));
+        EXPECT_FALSE(IsPrime(INT_MIN));
+    }
 
-// Tests some trivial cases.
-TEST(IsPrimeTest, Trivial) {
-  EXPECT_FALSE(IsPrime(0));
-  EXPECT_FALSE(IsPrime(1));
-  EXPECT_TRUE(IsPrime(2));
-  EXPECT_TRUE(IsPrime(3));
-}
+    // Tests some trivial cases.
+    TEST(IsPrimeTest, Trivial) {
+        EXPECT_FALSE(IsPrime(0));
+        EXPECT_FALSE(IsPrime(1));
+        EXPECT_TRUE(IsPrime(2));
+        EXPECT_TRUE(IsPrime(3));
+    }
 
-// Tests positive input.
-TEST(IsPrimeTest, Positive) {
-  EXPECT_FALSE(IsPrime(4));
-  EXPECT_TRUE(IsPrime(5));
-  EXPECT_FALSE(IsPrime(6));
-  EXPECT_TRUE(IsPrime(23));
-}
+    // Tests positive input.
+    TEST(IsPrimeTest, Positive) {
+        EXPECT_FALSE(IsPrime(4));
+        EXPECT_TRUE(IsPrime(5));
+        EXPECT_FALSE(IsPrime(6));
+        EXPECT_TRUE(IsPrime(23));
+    }
 }  // namespace
 
 // Step 3. Call RUN_ALL_TESTS() in main().
