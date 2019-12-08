@@ -161,12 +161,10 @@ cbuffer UniformBuff_Dyn
     float4 g_f4Color2;
 }
 
-/*
 RWTexture2D<float4 > g_rwtex2D_Static;
 RWTexture2D<float4 > g_rwtex2D_Static2;
 RWTexture2D<float4 >  g_rwtex2D_Mut;
 RWTexture2D<float4 >  g_rwtex2D_Dyn;
-*/
 
 RWByteAddressBuffer g_rwBuff_Static : register(u1);
 RWBuffer<float4> g_rwBuff_Mut : register(u2);
@@ -197,7 +195,7 @@ float4 main(VSOut In) : SV_Target
     Color += g_tex2D_Dyn.SampleLevel(g_tex2D_Dyn_sampler, float2(0.5,0.5), 0.0);
     Color += g_tex2D_DynArr[0].SampleLevel(g_tex2D_DynArr_sampler, float2(0.5,0.5), 0.0) + g_tex2D_DynArr[1].SampleLevel(g_tex2D_DynArr_sampler, float2(0.5,0.5), 0.0);
     Color += g_f4Color0 + g_f4Color01 + g_f4Color1 + g_f4Color2;
-    //Color += g_rwtex2D_Static.Load(int2(0,0)) + g_rwtex2D_Mut.Load(int2(0,0)) + g_rwtex2D_Dyn.Load(uint2(0,0)) + g_rwtex2D_Static2.Load(uint2(0,0));
+    Color += g_rwtex2D_Static.Load(int2(0,0)) + g_rwtex2D_Mut.Load(int2(0,0)) + g_rwtex2D_Dyn.Load(uint2(0,0)) + g_rwtex2D_Static2.Load(uint2(0,0));
     Color += asfloat(g_rwBuff_Static.Load(0)) + g_rwBuff_Mut.Load(0) + g_rwBuff_Dyn.Load(0);
 
     Color += g_Buffer_Static.Load(0);
