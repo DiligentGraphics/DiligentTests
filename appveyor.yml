@@ -31,7 +31,7 @@ before_build:
   #- cd c:\projects\DiligentTests\BuildTools\FormatValidation
   #- validate_format_win.bat
   - echo %APPVEYOR_BUILD_FOLDER%
-  - cmd: cd '"%APPVEYOR_BUILD_FOLDER%"/..'
+  - 'cd %APPVEYOR_BUILD_FOLDER%\..'
   - echo cmake_minimum_required(VERSION 3.6) > CMakeLists.txt
   - echo Project(DiligentEngineTests) >> CMakeLists.txt
   #- echo add_subdirectory(DiligentCore) >> CMakeLists.txt
