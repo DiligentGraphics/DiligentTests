@@ -22,6 +22,7 @@ clone_folder: c:\projects\DiligentTests
 
 install:
   # clone submodules
+  - echo %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   - git clone https://github.com/DiligentGraphics/DiligentCore.git ../DiligentCore --recursive
   - ..\DiligentCore\BuildTools\Scripts\appveyor\install.bat
@@ -43,4 +44,4 @@ build:
   parallel: true
 
 test_script:
-    C:\projects\build\DiligentTests\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe
+    '%APPVEYOR_BUILD_FOLDER%\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe'
