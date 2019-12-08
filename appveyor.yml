@@ -22,6 +22,7 @@ clone_folder: c:\projects\DiligentTests
 
 install:
   # clone submodules
+  - generate_error.bat
   - echo %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   - git clone https://github.com/DiligentGraphics/DiligentCore.git ../DiligentCore --recursive
