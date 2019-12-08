@@ -25,12 +25,12 @@ install:
   - echo %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   - git clone https://github.com/DiligentGraphics/DiligentCore.git ../DiligentCore --recursive
-  - ..\DiligentCore\BuildTools\Scripts\appveyor\install.bat
+  - '%APPVEYOR_BUILD_FOLDER%\..\DiligentCore\BuildTools\Scripts\appveyor\install.bat'
 
 before_build:
   #- cd c:\projects\DiligentTests\BuildTools\FormatValidation
   #- validate_format_win.bat
-  - cd c:\projects
+  - cd '%APPVEYOR_BUILD_FOLDER%\..'
   - echo cmake_minimum_required(VERSION 3.6) > CMakeLists.txt
   - echo Project(DiligentEngineTests) >> CMakeLists.txt
   #- echo add_subdirectory(DiligentCore) >> CMakeLists.txt
@@ -44,4 +44,4 @@ build:
   parallel: true
 
 test_script:
-    '%APPVEYOR_BUILD_FOLDER%\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe'
+    C:\projects\build\DiligentTests\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe
