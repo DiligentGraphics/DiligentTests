@@ -47,6 +47,130 @@
 #   include <dxgi1_2.h>
 #   include <atlcomcli.h>
 #   include <d3d11.h>
+#include <D3Dcompiler.h>
+
+static const char* PSSource = R"(
+Texture2D g_tex2D_Static;
+Texture2D g_tex2D_Mut;
+Texture2D g_tex2D_MutArr[2];
+Texture2D g_tex2D_Dyn;
+Texture2D g_tex2D_DynArr[2];
+Texture2D g_tex2D_StaticArr[2];
+
+SamplerState g_tex2D_Static_sampler;
+SamplerState g_tex2D_Mut_sampler;
+SamplerState g_tex2D_Dyn_sampler;
+SamplerState g_tex2D_MutArr_sampler;
+SamplerState g_tex2D_DynArr_sampler;
+SamplerState g_tex2D_StaticArr_sampler;
+
+cbuffer UniformBuff_Stat
+{
+	float4 g_f4Color0;
+}
+
+cbuffer UniformBuff_Stat2
+{
+	float4 g_f4Color01;
+}
+
+cbuffer UniformBuff_Mut
+{
+	float4 g_f4Color1;
+}
+
+cbuffer UniformBuff_Dyn
+{
+	float4 g_f4Color2;
+}
+
+RWTexture2D<float4 /*format=rgba32f*/> g_rwtex2D_Static;
+RWTexture2D<float4 /*format=rgba32f*/> g_rwtex2D_Static2;
+RWTexture2D<float4 /*format=rgba32f*/>  g_rwtex2D_Mut;
+RWTexture2D<float4 /*format=rgba32f*/>  g_rwtex2D_Dyn;
+
+RWByteAddressBuffer g_rwBuff_Static;
+RWBuffer<float4> g_rwBuff_Mut;
+RWBuffer<float4> g_rwBuff_Dyn;
+
+Buffer<float4> g_Buffer_Static;
+Buffer<float4> g_Buffer_StaticArr[2];
+ByteAddressBuffer g_Buffer_Mut;
+Buffer<float4> g_Buffer_MutArr[2];
+Buffer<float4> g_Buffer_Dyn;
+Buffer<float4> g_Buffer_DynArr[2];
+
+struct VSOut
+{
+	float4 f4Position : SV_Position;
+	float4 f4Color	: COLOR;
+};
+
+ 
+float4 main(VSOut In) : SV_Target
+{
+    float4 Color = In.f4Color;
+    Color += g_tex2D_Static.SampleLevel(g_tex2D_Static_sampler, float2(0.5,0.5), 0.0);
+    Color += g_tex2D_StaticArr[0].SampleLevel(g_tex2D_StaticArr_sampler, float2(0.5,0.5), 0.0) + g_tex2D_StaticArr[1].SampleLevel(g_tex2D_StaticArr_sampler, float2(0.5,0.5), 0.0);
+    Color += g_tex2D_Mut.SampleLevel(g_tex2D_Mut_sampler, float2(0.5,0.5), 0.0);
+    Color += g_tex2D_MutArr[0].SampleLevel(g_tex2D_MutArr_sampler, float2(0.5,0.5), 0.0) + g_tex2D_MutArr[1].SampleLevel(g_tex2D_MutArr_sampler, float2(0.5,0.5), 0.0);
+    Color += g_tex2D_Dyn.SampleLevel(g_tex2D_Dyn_sampler, float2(0.5,0.5), 0.0);
+    Color += g_tex2D_DynArr[0].SampleLevel(g_tex2D_DynArr_sampler, float2(0.5,0.5), 0.0) + g_tex2D_DynArr[1].SampleLevel(g_tex2D_DynArr_sampler, float2(0.5,0.5), 0.0);
+    Color += g_f4Color0 + g_f4Color01 + g_f4Color1 + g_f4Color2;
+    Color += g_rwtex2D_Static.Load(int2(0,0)) + g_rwtex2D_Mut.Load(int2(0,0)) + g_rwtex2D_Dyn.Load(uint2(0,0)) + g_rwtex2D_Static2.Load(uint2(0,0));
+    Color += asfloat(g_rwBuff_Static.Load(0)) + g_rwBuff_Mut.Load(0) + g_rwBuff_Dyn.Load(0);
+
+    Color += g_Buffer_Static.Load(0);
+    Color += g_Buffer_StaticArr[0].Load(0) + g_Buffer_StaticArr[1].Load(0);
+    Color += asfloat(g_Buffer_Mut.Load(0));
+    Color += g_Buffer_MutArr[0].Load(0) + g_Buffer_MutArr[1].Load(0);
+    Color += g_Buffer_Dyn.Load(0);
+    Color += g_Buffer_DynArr[0].Load(0) + g_Buffer_DynArr[1].Load(0);
+
+	return Color;
+}
+)";
+
+static HRESULT CompileShader(const char*                      Source,
+    LPCSTR                           strFunctionName,
+    const D3D_SHADER_MACRO*          pDefines,
+    LPCSTR                           profile,
+    ID3DBlob**                       ppBlobOut,
+    ID3DBlob**                       ppCompilerOutput)
+{
+    DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if defined(DEBUG) || defined(_DEBUG)
+    // Set the D3D10_SHADER_DEBUG flag to embed debug information in the shaders.
+    // Setting this flag improves the shader debugging experience, but still allows
+    // the shaders to be optimized and to run exactly the way they will run in
+    // the release configuration of this program.
+    dwShaderFlags |= D3DCOMPILE_DEBUG;
+#else
+    // Warning: do not use this flag as it causes shader compiler to fail the compilation and
+    // report strange errors:
+    // dwShaderFlags |= D3D10_SHADER_OPTIMIZATION_LEVEL3;
+#endif
+    HRESULT hr;
+    //	do
+    //	{
+    auto SourceLen = strlen(Source);
+
+    hr = D3DCompile(Source, SourceLen, NULL, pDefines, nullptr, strFunctionName, profile, dwShaderFlags, 0, ppBlobOut, ppCompilerOutput);
+
+    //		if( FAILED(hr) || errors )
+    //		{
+    //			if( FAILED(hr)
+    //#if PLATFORM_WIN32
+    //                && IDRETRY != MessageBoxW( NULL, L"Failed to compile shader", L"FX Error", MB_ICONERROR | (Source == nullptr ? MB_ABORTRETRYIGNORE : 0) )
+    //#endif
+    //                )
+    //			{
+    //				break;
+    //			}
+    //		}
+    //	} while( FAILED(hr) );
+    return hr;
+}
 
 class Direct3DTest
 {
@@ -82,7 +206,7 @@ public:
             pDXIAdapter->GetDesc1(&AdapterDesc);
             char DescriptionMB[_countof(AdapterDesc.Description)];
             WideCharToMultiByte(CP_ACP, 0, AdapterDesc.Description, -1, DescriptionMB, _countof(DescriptionMB), NULL, FALSE);
-            std::cout << "Found adapter '" << DescriptionMB << "' (" << AdapterDesc.DedicatedVideoMemory / (1<<20) << ") MB\n";
+            std::cout << "Found adapter '" << DescriptionMB << "' (" << AdapterDesc.DedicatedVideoMemory / (1 << 20) << ") MB\n";
             auto hr = D3D11CreateDevice(
                 nullptr,
                 D3D_DRIVER_TYPE_NULL, // There is no need to create a real hardware device.
@@ -119,7 +243,7 @@ public:
                 &d3dFeatureLevel,     // Feature levels.
                 1,                 // Number of feature levels
                 D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
-                &pDevice,          
+                &pDevice,
                 nullptr,           // Feature level of the created adapter.
                 nullptr            // No need to keep the D3D device context reference.
             );
@@ -135,7 +259,7 @@ public:
                 &d3dFeatureLevel,     // Feature levels.
                 1,                 // Number of feature levels
                 D3D11_SDK_VERSION, // Always set this to D3D11_SDK_VERSION for Windows Store apps.
-                &pDevice,          
+                &pDevice,
                 nullptr,           // Feature level of the created adapter.
                 nullptr            // No need to keep the D3D device context reference.
             );
@@ -146,20 +270,37 @@ public:
             std::cout << "Successfully created WARP adapter!\n";
             auto FL = pDevice->GetFeatureLevel();
             std::cout << "Device feature level: ";
-            switch(FL)
+            switch (FL)
             {
-                case D3D_FEATURE_LEVEL_10_0: std::cout << "10_0"; break;
-                case D3D_FEATURE_LEVEL_10_1: std::cout << "10_1"; break;
-                case D3D_FEATURE_LEVEL_11_0: std::cout << "11_0"; break;
-                case D3D_FEATURE_LEVEL_11_1: std::cout << "11_1"; break;
-                case D3D_FEATURE_LEVEL_12_0: std::cout << "12_0"; break;
-                case D3D_FEATURE_LEVEL_12_1: std::cout << "12_1"; break;
+            case D3D_FEATURE_LEVEL_10_0: std::cout << "10_0"; break;
+            case D3D_FEATURE_LEVEL_10_1: std::cout << "10_1"; break;
+            case D3D_FEATURE_LEVEL_11_0: std::cout << "11_0"; break;
+            case D3D_FEATURE_LEVEL_11_1: std::cout << "11_1"; break;
+            case D3D_FEATURE_LEVEL_12_0: std::cout << "12_0"; break;
+            case D3D_FEATURE_LEVEL_12_1: std::cout << "12_1"; break;
             }
             std::cout << "\n";
         }
         else
         {
             std::cout << "Unable to create WARP adapter :(\n";
+        }
+
+        CComPtr<ID3DBlob> ShaderByteCode;
+        CComPtr<ID3DBlob> errors;
+        hr = CompileShader(PSSource, "main", nullptr, "ps_5_0", &ShaderByteCode, &errors);
+        const char* CompilerMsg = errors ? reinterpret_cast<const char*>(errors->GetBufferPointer()) : nullptr;
+        if (SUCCEEDED(hr))
+        {
+            std::cout << "Successfully compiled the shader!\n";
+        }
+        else
+        {
+            std::cout << "Failed to compile the shader :(\n";
+            if (CompilerMsg != nullptr)
+            {
+                std::cout << "Compiler output:\n" << CompilerMsg;
+            }
         }
 
         return std::move(DXGIAdapters);
