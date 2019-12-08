@@ -1,1 +1,1 @@
-exit /B 1
+exit /B 0
