@@ -448,7 +448,7 @@ public:
         else
         {
             ComErrorDesc HRErr(hr);
-            std::cout << "Failed to create the pixelshader :(\n" << HRErr.Get() << "\n";
+            std::cout << "Failed to create the pixelshader :(\n" << HRErr.Get() << " (" << std::hex << hr << ")\n";
 
         }
 
