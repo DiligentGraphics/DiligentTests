@@ -401,6 +401,17 @@ public:
             }
         }
 
+        CComPtr<ID3D11PixelShader> PixelShader;
+        hr = pDevice->CreatePixelShader(ShaderByteCode->GetBufferPointer(), ShaderByteCode->GetBufferSize(), NULL, &PixelShader);
+        if (SUCCEEDED(hr))
+        {
+            std::cout << "Successfully created the pixel shader!\n";
+        }
+        else
+        {
+            std::cout << "Failed to create the pixelshader :(\n";
+        }
+
         return std::move(DXGIAdapters);
     }
 
