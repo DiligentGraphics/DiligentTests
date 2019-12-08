@@ -126,6 +126,7 @@ float2x2 MatrixFromRows(float2 row0, float2 row1)
 
 #endif // _HLSL_DEFINITIONS_
 
+/*
 Texture2D g_tex2D_Static;
 Texture2D g_tex2D_Mut;
 Texture2D g_tex2D_MutArr[2];
@@ -160,10 +161,10 @@ cbuffer UniformBuff_Dyn
     float4 g_f4Color2;
 }
 
-RWTexture2D<float4 /*format=rgba32f*/> g_rwtex2D_Static;
-RWTexture2D<float4 /*format=rgba32f*/> g_rwtex2D_Static2;
-RWTexture2D<float4 /*format=rgba32f*/>  g_rwtex2D_Mut;
-RWTexture2D<float4 /*format=rgba32f*/>  g_rwtex2D_Dyn;
+RWTexture2D<float4 > g_rwtex2D_Static;
+RWTexture2D<float4 > g_rwtex2D_Static2;
+RWTexture2D<float4 >  g_rwtex2D_Mut;
+RWTexture2D<float4 >  g_rwtex2D_Dyn;
 
 RWByteAddressBuffer g_rwBuff_Static;
 RWBuffer<float4> g_rwBuff_Mut;
@@ -175,6 +176,7 @@ ByteAddressBuffer g_Buffer_Mut;
 Buffer<float4> g_Buffer_MutArr[2];
 Buffer<float4> g_Buffer_Dyn;
 Buffer<float4> g_Buffer_DynArr[2];
+*/
 
 struct VSOut
 {
@@ -186,7 +188,7 @@ struct VSOut
 float4 main(VSOut In) : SV_Target
 {
     float4 Color = In.f4Color;
-    Color += g_tex2D_Static.SampleLevel(g_tex2D_Static_sampler, float2(0.5,0.5), 0.0);
+    /*Color += g_tex2D_Static.SampleLevel(g_tex2D_Static_sampler, float2(0.5,0.5), 0.0);
     Color += g_tex2D_StaticArr[0].SampleLevel(g_tex2D_StaticArr_sampler, float2(0.5,0.5), 0.0) + g_tex2D_StaticArr[1].SampleLevel(g_tex2D_StaticArr_sampler, float2(0.5,0.5), 0.0);
     Color += g_tex2D_Mut.SampleLevel(g_tex2D_Mut_sampler, float2(0.5,0.5), 0.0);
     Color += g_tex2D_MutArr[0].SampleLevel(g_tex2D_MutArr_sampler, float2(0.5,0.5), 0.0) + g_tex2D_MutArr[1].SampleLevel(g_tex2D_MutArr_sampler, float2(0.5,0.5), 0.0);
@@ -202,7 +204,7 @@ float4 main(VSOut In) : SV_Target
     Color += g_Buffer_MutArr[0].Load(0) + g_Buffer_MutArr[1].Load(0);
     Color += g_Buffer_Dyn.Load(0);
     Color += g_Buffer_DynArr[0].Load(0) + g_Buffer_DynArr[1].Load(0);
-
+*/
     return Color;
 }
 )";
