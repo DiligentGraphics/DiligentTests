@@ -208,6 +208,44 @@ float4 main(VSOut In) : SV_Target
 )";
 
 
+class ComErrorDesc
+{
+public:
+    ComErrorDesc(HRESULT hr)
+    {
+        auto NumCharsWritten = FormatMessageA(
+            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            hr,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            m_Msg,
+            _countof(m_Msg),
+            NULL);
+
+        if (NumCharsWritten == 0)
+        {
+            strcpy_s(m_Msg, _countof(m_Msg), "Unknown error");
+        }
+        else
+        {
+            auto nLen = strlen(m_Msg);
+            if (nLen > 1 && m_Msg[nLen - 1] == '\n')
+            {
+                m_Msg[nLen - 1] = 0;
+                if (m_Msg[nLen - 2] == '\r')
+                {
+                    m_Msg[nLen - 2] = 0;
+                }
+            }
+        }
+    }
+
+    const char* Get() { return m_Msg; }
+
+private:
+    char m_Msg[4096];
+};
+
 class D3DIncludeImpl : public ID3DInclude
 {
 public:
@@ -409,7 +447,9 @@ public:
         }
         else
         {
-            std::cout << "Failed to create the pixelshader :(\n";
+            ComErrorDesc HRErr(hr);
+            std::cout << "Failed to create the pixelshader :(\n" << HRErr.Get() << "\n";
+
         }
 
         return std::move(DXGIAdapters);
