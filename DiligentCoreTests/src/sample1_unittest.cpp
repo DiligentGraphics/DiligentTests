@@ -168,9 +168,9 @@ RWTexture2D<float4 >  g_rwtex2D_Mut;
 RWTexture2D<float4 >  g_rwtex2D_Dyn;
 */
 
-RWByteAddressBuffer g_rwBuff_Static;
-RWBuffer<float4> g_rwBuff_Mut;
-RWBuffer<float4> g_rwBuff_Dyn;
+RWByteAddressBuffer g_rwBuff_Static : register(u1);
+RWBuffer<float4> g_rwBuff_Mut : register(u2);
+RWBuffer<float4> g_rwBuff_Dyn  : register(u3);
 
 Buffer<float4> g_Buffer_Static;
 Buffer<float4> g_Buffer_StaticArr[2];
