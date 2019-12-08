@@ -45,5 +45,4 @@ build:
   parallel: true
 
 test_script:
-  - run_test.bat
-
+  - '%APPVEYOR_BUILD_FOLDER%\run_test.bat'
