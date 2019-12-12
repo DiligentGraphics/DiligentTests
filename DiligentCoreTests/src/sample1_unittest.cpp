@@ -319,8 +319,43 @@ public:
         FindCompatibleAdapters();
     }
 
+    HWND CreateNativeWindow()
+    {
+    #ifdef UNICODE
+        const auto* const WindowClassName = L"SampleApp";
+    #else
+        const auto* const WindowClassName = "SampleApp";
+    #endif
+        // Register window class
+        HINSTANCE instance = NULL;
+
+        WNDCLASSEX wcex = {sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, DefWindowProc,
+                           0L, 0L, instance, NULL, NULL, NULL, NULL, WindowClassName, NULL};
+        RegisterClassEx(&wcex);
+
+        LONG WindowWidth  = 512;
+        LONG WindowHeight = 512;
+        RECT rc           = {0, 0, WindowWidth, WindowHeight};
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+        HWND wnd = CreateWindowA("SampleApp", "Dummy Window",
+                                 WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+                                 rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
+        if (wnd != NULL)
+        {
+            std::cout << "Successfully created a window!!\n";
+        }
+        else
+        {
+            std::cout << "Failed to create a window :(\n";
+        }
+
+        return wnd;
+    }
+
     std::vector<CComPtr<IDXGIAdapter1>> FindCompatibleAdapters()
     {
+        auto hWnd = CreateNativeWindow();
+
         std::vector<CComPtr<IDXGIAdapter1>> DXGIAdapters;
 
         CComPtr<IDXGIFactory2> pFactory;
