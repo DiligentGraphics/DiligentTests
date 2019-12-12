@@ -352,6 +352,115 @@ public:
         return wnd;
     }
 
+    void CreateSwapChain(HWND hWnd, ID3D11Device* pDevice, IDXGIFactory2* pFactory)
+    {
+        auto DXGIColorBuffFmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+
+        swapChainDesc.Width  = 512;
+        swapChainDesc.Height = 512;
+        //  Flip model swapchains (DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD) only support the following Formats:
+        //  - DXGI_FORMAT_R16G16B16A16_FLOAT
+        //  - DXGI_FORMAT_B8G8R8A8_UNORM
+        //  - DXGI_FORMAT_R8G8B8A8_UNORM
+        //  - DXGI_FORMAT_R10G10B10A2_UNORM
+        // If RGBA8_UNORM_SRGB swap chain is required, we will create RGBA8_UNORM swap chain, but
+        // create RGBA8_UNORM_SRGB render target view
+        switch (DXGIColorBuffFmt)
+        {
+            case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+                swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                break;
+
+            case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+                swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+                break;
+
+            default:
+                swapChainDesc.Format = DXGIColorBuffFmt;
+        }
+
+        swapChainDesc.Stereo = FALSE;
+
+        // Multi-sampled swap chains are not supported anymore. CreateSwapChainForHwnd() fails when sample count is not 1
+        // for any swap effect.
+        swapChainDesc.SampleDesc.Count   = 1;
+        swapChainDesc.SampleDesc.Quality = 0;
+
+        swapChainDesc.BufferUsage |= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        swapChainDesc.BufferUsage |= DXGI_USAGE_SHADER_INPUT;
+        //if (m_SwapChainDesc.Usage & SWAP_CHAIN_USAGE_COPY_SOURCE)
+        //    ;
+
+        swapChainDesc.BufferCount = 2;
+        swapChainDesc.Scaling     = DXGI_SCALING_NONE;
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+        swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+#endif
+
+        // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL is the flip presentation model, where the contents of the back
+        // buffer is preserved after the call to Present. This flag cannot be used with multisampling.
+        // The only swap effect that supports multisampling is DXGI_SWAP_EFFECT_DISCARD.
+        // Windows Store apps must use DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL or DXGI_SWAP_EFFECT_FLIP_DISCARD.
+        swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+
+        swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED; //  Transparency behavior is not specified
+
+        // DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH enables an application to switch modes by calling
+        // IDXGISwapChain::ResizeTarget(). When switching from windowed to fullscreen mode, the display
+        // mode (or monitor resolution) will be changed to match the dimensions of the application window.
+        swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+
+        DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc = {};
+
+        FullScreenDesc.Windowed                = TRUE;
+        FullScreenDesc.RefreshRate.Numerator   = 0;
+        FullScreenDesc.RefreshRate.Denominator = 0;
+        FullScreenDesc.Scaling                 = DXGI_MODE_SCALING_UNSPECIFIED;
+        FullScreenDesc.ScanlineOrdering        = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+
+        CComPtr<IDXGISwapChain1> pSwapChain1;
+        auto hr = pFactory->CreateSwapChainForHwnd(pDevice, hWnd, &swapChainDesc, &FullScreenDesc, nullptr, &pSwapChain1);
+        if (SUCCEEDED(hr))
+        {
+            std::cout << "Successfully create a swap chain!!\n";
+        }
+        else
+        {
+            std::cout << "Failed to create the swap chain :(\n";
+            return;
+        }
+
+
+        pSwapChain1->GetDesc1(&swapChainDesc);
+        std::cout << "Swap chain width: " << swapChainDesc.Width << ", height: " << swapChainDesc.Height<<"\n";
+
+
+        {
+            // This is silly, but IDXGIFactory used for MakeWindowAssociation must be retrieved via
+            // calling IDXGISwapchain::GetParent first, otherwise it won't work
+            // https://www.gamedev.net/forums/topic/634235-dxgidisabling-altenter/?do=findComment&comment=4999990
+            CComPtr<IDXGIFactory1> pFactoryFromSC;
+            if (SUCCEEDED(pSwapChain1->GetParent(__uuidof(pFactoryFromSC), (void**)&pFactoryFromSC)))
+            {
+                // Do not allow the swap chain to handle Alt+Enter
+                pFactoryFromSC->MakeWindowAssociation(hWnd, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
+            }
+        }
+        hr = pSwapChain1->Present(1, 0);
+        if (SUCCEEDED(hr))
+        {
+            std::cout << "Present succeeded!\n";
+        }
+        else
+        {
+            std::cout << "Present failed :(\n";
+            return;
+        }
+    }
+
     std::vector<CComPtr<IDXGIAdapter1>> FindCompatibleAdapters()
     {
         auto hWnd = CreateNativeWindow();
@@ -458,6 +567,8 @@ public:
         {
             std::cout << "Unable to create WARP adapter :(\n";
         }
+
+        CreateSwapChain(hWnd, pDevice, pFactory);
 
         CComPtr<ID3DBlob> ShaderByteCode;
         CComPtr<ID3DBlob> errors;
