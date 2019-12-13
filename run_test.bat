@@ -5,6 +5,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 @echo Error level : %ERRORLEVEL%
+@echo Error: %ERROR%
 
 C:\projects\build\DiligentTests\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe --gtest_filter=FactorialTest.Zero
 if %ERRORLEVEL% NEQ 0 (
@@ -12,5 +13,6 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 @echo Error level : %ERRORLEVEL%
+@echo Error: %ERROR%
 
 exit /B %ERROR%
