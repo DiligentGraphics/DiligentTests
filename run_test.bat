@@ -2,6 +2,8 @@ set ERROR=0
 C:\projects\build\DiligentTests\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe
 if %ERRORLEVEL% NEQ 0 (
 	set ERROR=%ERRORLEVEL%
+	echo Detect test failure, error_level = %ERRORLEVEL%
+	echo Detect test failure, error = %ERROR%
 )
 
 @echo Error level : %ERRORLEVEL%
@@ -15,4 +17,4 @@ if %ERRORLEVEL% NEQ 0 (
 @echo Error level : %ERRORLEVEL%
 @echo Error: %ERROR%
 
-exit /B %ERROR%
+rem exit /B %ERROR%
