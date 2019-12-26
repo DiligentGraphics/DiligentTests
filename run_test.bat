@@ -3,7 +3,7 @@
 setlocal ENABLEDELAYEDEXPANSION
 
 echo calling echo_test.bat...
-C:\projects\DiligentTests\echo_test.bat
+call C:\projects\DiligentTests\echo_test.bat
 echo after echo_test.bat...
 
 set ERROR=0
