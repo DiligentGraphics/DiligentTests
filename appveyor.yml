@@ -10,6 +10,7 @@ image:
 - Visual Studio 2019
 
 environment:
+  global_var: TestValue
   matrix:
     - platform: x64
       configuration: Debug
@@ -30,6 +31,7 @@ install:
 before_build:
   #- cd c:\projects\DiligentTests\BuildTools\FormatValidation
   #- validate_format_win.bat
+  - echo %global_var%
   - echo %APPVEYOR_BUILD_FOLDER%
   - 'cd %APPVEYOR_BUILD_FOLDER%\..'
   - echo cmake_minimum_required(VERSION 3.6) > CMakeLists.txt
