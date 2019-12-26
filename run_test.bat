@@ -1,4 +1,10 @@
 @echo off
+
+setlocal ENABLEDELAYEDEXPANSION
+
+echo calling echo_test.bat...
+echo_test.bat
+
 set ERROR=0
 C:\projects\build\DiligentTests\DiligentCoreTests\%CONFIGURATION%\DiligentCore_Tests.exe
 if %ERRORLEVEL% NEQ 0 (
