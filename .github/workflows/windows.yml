@@ -12,17 +12,20 @@ jobs:
     runs-on: windows-2019
     name: Win10 -> ${{ matrix.toolset }}, ${{ matrix.config }}
 
+    env:
+      CMAKE_GENERATOR_PLATFORM: ${{ matrix.toolset }}
+
     steps:
     - name: Clone DiligentTests
       uses: actions/checkout@v2
       with:
         submodules: recursive
 
-    - name: Clone DiligentCore
-      uses: actions/checkout@v2
-      with:
-        repository: 'DiligentGraphics/DiligentCore'
-        path:       DiligentCore
+    #- name: Clone DiligentCore
+    #  uses: actions/checkout@v2
+    #  with:
+    #    repository: 'DiligentGraphics/DiligentCore'
+    #    path:       DiligentCore
 
     - name: Configure CMake
       if: success()
@@ -30,8 +33,12 @@ jobs:
       run: |
         #cd $GITHUB_WORKSPACE/DiligentTests/BuildTools/Scripts/github_actions
         #./create_cmake.sh "$GITHUB_WORKSPACE"
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        ./configure_cmake.sh "win" "${{runner.workspace}}" ${{ matrix.toolset }} ${{ matrix.config }}
+        #cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
+        #./configure_cmake.sh "win" "${{runner.workspace}}" ${{ matrix.toolset }} ${{ matrix.config }}
+        cd "${{runner.workspace}}"
+        mkdir build
+        cd ./build
+        cmake "$GITHUB_WORKSPACE" -DCMAKE_BUILD_TYPE=${{runner.config}}
 
     - name: Build
       if: success()
@@ -64,12 +71,12 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: recursive
-        
-    - name: Clone DiligentCore
-      uses: actions/checkout@v2
-      with:
-        repository: 'DiligentGraphics/DiligentCore'
-        path:       DiligentCore
+
+    #- name: Clone DiligentCore
+    #  uses: actions/checkout@v2
+    #  with:
+    #    repository: 'DiligentGraphics/DiligentCore'
+    #    path:       DiligentCore
 
     - name: Setup Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
