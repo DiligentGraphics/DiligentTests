@@ -24,6 +24,7 @@ jobs:
         submodules: recursive
 
     - name: Setup Ninja
+      if: ${{ matrix.cmake_generator == 'Ninja' }}
       #check_suite.app.name == 'Netlify' && github.event.check_suite.conclusion == 'success'
       uses: seanmiddleditch/gha-setup-ninja@master
 
@@ -33,15 +34,10 @@ jobs:
     #    msbuild-architecture: ${{ matrix.toolset }}
 
     - name: Setup Developer Command Prompt for VS
+      if: ${{ matrix.cmake_generator == 'Ninja' }}
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{ matrix.toolset }}
-
-    #- name: Clone DiligentCore
-    #  uses: actions/checkout@v2
-    #  with:
-    #    repository: 'DiligentGraphics/DiligentCore'
-    #    path:       DiligentCore
 
     - name: Configure CMake
       if: success()
@@ -50,7 +46,6 @@ jobs:
         #CMAKE_GENERATOR_PLATFORM: ${{ matrix.toolset }}
       shell: bash
       run: |
-        echo $CMAKE_GENERATOR $CMAKE_GENERATOR_PLATFORM
         #cd $GITHUB_WORKSPACE/DiligentTests/BuildTools/Scripts/github_actions
         #./create_cmake.sh "$GITHUB_WORKSPACE"
         #cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
@@ -71,4 +66,6 @@ jobs:
       shell: bash
       run: |
         #cd "${{runner.workspace}}\DiligentTests\Tests\DiligentToolsTest\assets"
-        "${{runner.workspace}}\build\DiligentCoreTests\${{ matrix.config }}\DiligentCore_Tests.exe"
+        export BIN_DIR="${{runner.workspace}}\build\DiligentCoreTests"
+        if [ "${{ matrix.cmake_generator }}" != "Ninja" ]; then BIN_DIR="$BIN_DIR\${{ matrix.config }}"; fi
+        "$BIN_DIR\DiligentCore_Tests.exe"
