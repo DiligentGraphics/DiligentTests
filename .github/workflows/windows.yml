@@ -6,20 +6,36 @@ jobs:
   build-win10:
     strategy:
       matrix:
-        toolset: [x64]
+        toolset: [x64, Win32]
         config: [Debug]
+        include:
+          - toolset: Win32
+            cmake_generator: "Ninja"
+          - toolset: x64
+            cmake_generator: "Visual Studio 16 2019"
 
     runs-on: windows-2019
     name: Win10 -> ${{ matrix.toolset }}, ${{ matrix.config }}
-
-    env:
-      CMAKE_GENERATOR_PLATFORM: ${{ matrix.toolset }}
 
     steps:
     - name: Clone DiligentTests
       uses: actions/checkout@v2
       with:
         submodules: recursive
+
+    - name: Setup Ninja
+      #check_suite.app.name == 'Netlify' && github.event.check_suite.conclusion == 'success'
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    #- name: Add msbuild to PATH
+    #  uses: microsoft/setup-msbuild@v1.1
+    #  with:
+    #    msbuild-architecture: ${{ matrix.toolset }}
+
+    - name: Setup Developer Command Prompt for VS
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.toolset }}
 
     #- name: Clone DiligentCore
     #  uses: actions/checkout@v2
@@ -29,8 +45,12 @@ jobs:
 
     - name: Configure CMake
       if: success()
+      env:
+        CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+        #CMAKE_GENERATOR_PLATFORM: ${{ matrix.toolset }}
       shell: bash
       run: |
+        echo $CMAKE_GENERATOR $CMAKE_GENERATOR_PLATFORM
         #cd $GITHUB_WORKSPACE/DiligentTests/BuildTools/Scripts/github_actions
         #./create_cmake.sh "$GITHUB_WORKSPACE"
         #cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
@@ -52,67 +72,3 @@ jobs:
       run: |
         #cd "${{runner.workspace}}\DiligentTests\Tests\DiligentToolsTest\assets"
         "${{runner.workspace}}\build\DiligentCoreTests\${{ matrix.config }}\DiligentCore_Tests.exe"
-
-
-  build-win10-ninja:
-    strategy:
-      matrix:
-        toolset: [Win32]
-        config: [Debug]
-
-    env:
-      CMAKE_GENERATOR: "Ninja"
-
-    runs-on: windows-2019
-    name: Win10-Ninja -> ${{ matrix.toolset }}, ${{ matrix.config }}
-
-    steps:
-    - name: Clone DiligentTests
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
-    #- name: Clone DiligentCore
-    #  uses: actions/checkout@v2
-    #  with:
-    #    repository: 'DiligentGraphics/DiligentCore'
-    #    path:       DiligentCore
-
-    - name: Setup Ninja
-      uses: seanmiddleditch/gha-setup-ninja@master
-
-    #- name: Add msbuild to PATH
-    #  uses: microsoft/setup-msbuild@v1.1
-    #  with:
-    #    msbuild-architecture: ${{ matrix.toolset }}
-
-    - name: Setup Developer Command Prompt for VS
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: ${{ matrix.toolset }}
-
-    - name: Configure CMake
-      if: success()
-      shell: bash
-      run: |
-        #cd $GITHUB_WORKSPACE/DiligentTests/BuildTools/Scripts/github_actions
-        #./create_cmake.sh "$GITHUB_WORKSPACE"
-        #cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        #./configure_cmake.sh "win" "${{runner.workspace}}" ${{ matrix.toolset }} ${{ matrix.config }}
-        cd "${{runner.workspace}}"
-        mkdir build
-        cd ./build
-        cmake "$GITHUB_WORKSPACE" -DCMAKE_BUILD_TYPE=${{runner.config}}
-
-    - name: Build
-      if: success()
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: cmake --build .
-#
-#    - name: Tests
-#      if: success()
-#      shell: bash
-#      run: |
-#        #cd "${{runner.workspace}}\DiligentTests\Tests\DiligentToolsTest\assets"
-#        "${{runner.workspace}}\build\DiligentCoreTests\${{ matrix.config }}\DiligentCore_Tests.exe"
