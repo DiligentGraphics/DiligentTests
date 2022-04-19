@@ -80,16 +80,15 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Clone DiligentCore
+    - name: Clone DiligentTools
       uses: actions/checkout@v2
       with:
-        repository: 'DiligentGraphics/DiligentCore'
-        path:       DiligentCore
+        repository: 'DiligentGraphics/DiligentTools'
+        path:       DiligentTools
 
     - uses: codespell-project/actions-codespell@master
       with:
         check_filenames: true
-        #ignore_words_file: .github/codespellignore
-        ignore_words_list: ser,inout,lod,pres,boundimg,ot
-        skip: DiligentCore/ThirdParty,ThirdParty
+        ignore_words_list: inout
+        skip: ./DiligentTools/ThirdParty,./DiligentTools/NativeApp/Android/ndk_helper,./DiligentTools/NativeApp/Android/arcore_sdk,./ThirdParty
         path: .
