@@ -89,7 +89,6 @@ jobs:
     - uses: codespell-project/actions-codespell@master
       with:
         check_filenames: true
-        #ignore_words_file: .github/codespellignore
-        ignore_words_list: ser,inout,lod,pRes,BoundImg
-        skip: ./DiligentCore/ThirdParty,./ThirdParty
-        path: .
+        ignore_words_file: .github/codespellignore
+        skip: ./DiligentCore/ThirdParty
+        path: ./DiligentCore
