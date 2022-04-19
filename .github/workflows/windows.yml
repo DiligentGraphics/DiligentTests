@@ -90,5 +90,6 @@ jobs:
       with:
         check_filenames: true
         #ignore_words_file: .github/codespellignore
-        skip: ./ThirdParty,*.gltf
+        ignore_words_list: ser,inout,lod,pRes,BoundImg
+        skip: ./DiligentCore/ThirdParty,./ThirdParty
         path: .
