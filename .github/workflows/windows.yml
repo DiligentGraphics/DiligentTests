@@ -80,15 +80,15 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Clone DiligentFX
+    - name: Clone DiligentSamples
       uses: actions/checkout@v2
       with:
-        repository: 'DiligentGraphics/DiligentFX'
-        path:       DiligentFX
+        repository: 'DiligentGraphics/DiligentSamples'
+        path:       DiligentSamples
 
     - uses: codespell-project/actions-codespell@master
       with:
         check_filenames: true
         ignore_words_list: inout,lod
-        skip: ./DiligentFX/ThirdParty
-        path: ./DiligentFX
+        skip: ./DiligentSamples/ThirdParty,*.gltf
+        path: ./DiligentSamples
