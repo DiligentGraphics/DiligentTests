@@ -80,15 +80,15 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Clone DiligentTools
+    - name: Clone DiligentFX
       uses: actions/checkout@v2
       with:
-        repository: 'DiligentGraphics/DiligentTools'
-        path:       DiligentTools
+        repository: 'DiligentGraphics/DiligentFX'
+        path:       DiligentFX
 
     - uses: codespell-project/actions-codespell@master
       with:
         check_filenames: true
-        ignore_words_list: inout
-        skip: ./DiligentTools/ThirdParty,./DiligentTools/NativeApp/Android/ndk_helper,./DiligentTools/NativeApp/Android/arcore_sdk,./ThirdParty
-        path: .
+        ignore_words_list: inout,lod
+        skip: ./DiligentFX/ThirdParty
+        path: ./DiligentFX
