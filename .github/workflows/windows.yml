@@ -23,15 +23,15 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Clone DiligentCore
+      uses: actions/checkout@v2
+      with:
+        repository: 'DiligentGraphics/DiligentCore'
+        path:       DiligentCore
+
     - name: Setup Ninja
       if: ${{ matrix.cmake_generator == 'Ninja' }}
-      #check_suite.app.name == 'Netlify' && github.event.check_suite.conclusion == 'success'
       uses: seanmiddleditch/gha-setup-ninja@master
-
-    #- name: Add msbuild to PATH
-    #  uses: microsoft/setup-msbuild@v1.1
-    #  with:
-    #    msbuild-architecture: ${{ matrix.toolset }}
 
     - name: Setup Developer Command Prompt for VS
       if: ${{ matrix.cmake_generator == 'Ninja' }}
