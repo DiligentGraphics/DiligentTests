@@ -23,12 +23,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Clone DiligentCore
-      uses: actions/checkout@v2
-      with:
-        repository: 'DiligentGraphics/DiligentCore'
-        path:       DiligentCore
-
     - name: Setup Ninja
       if: ${{ matrix.cmake_generator == 'Ninja' }}
       uses: seanmiddleditch/gha-setup-ninja@master
@@ -69,3 +63,32 @@ jobs:
         export BIN_DIR="${{runner.workspace}}\build\DiligentCoreTests"
         if [ "${{ matrix.cmake_generator }}" != "Ninja" ]; then BIN_DIR="$BIN_DIR\${{ matrix.config }}"; fi
         "$BIN_DIR\DiligentCore_Tests.exe"
+
+
+  codespell-linux:
+    strategy:
+      matrix:
+        toolset: [x64]
+        config: [Debug]
+
+    runs-on: ubuntu-latest
+    name: Linux -> codespell
+
+    steps:
+    - name: Clone DiligentTests
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Clone DiligentCore
+      uses: actions/checkout@v2
+      with:
+        repository: 'DiligentGraphics/DiligentCore'
+        path:       DiligentCore
+
+    - uses: codespell-project/actions-codespell@master
+      with:
+        check_filenames: true
+        #ignore_words_file: .github/codespellignore
+        skip: ./ThirdParty,*.gltf
+        path: .
