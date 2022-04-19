@@ -91,5 +91,5 @@ jobs:
         check_filenames: true
         #ignore_words_file: .github/codespellignore
         ignore_words_list: ser,inout,lod,pres,boundimg,ot
-        skip: DiligentCore/ThirdParty
-        path: DiligentCore
+        skip: DiligentCore/ThirdParty,ThirdParty
+        path: .
