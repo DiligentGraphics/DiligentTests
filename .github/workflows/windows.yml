@@ -23,6 +23,12 @@ jobs:
       with:
         submodules: recursive
 
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: cpp
+
     - name: Setup Ninja
       if: ${{ matrix.cmake_generator == 'Ninja' }}
       uses: seanmiddleditch/gha-setup-ninja@master
@@ -64,6 +70,8 @@ jobs:
         if [ "${{ matrix.cmake_generator }}" != "Ninja" ]; then BIN_DIR="$BIN_DIR\${{ matrix.config }}"; fi
         "$BIN_DIR\DiligentCore_Tests.exe"
 
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
 
   codespell-linux:
     strategy:
