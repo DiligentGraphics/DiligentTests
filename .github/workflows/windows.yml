@@ -23,6 +23,18 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Failure Test
+      shell: bash
+      run: |
+        chmod +x ./exit_with_error.sh
+        EXIT_CODE=0
+        "${{github.workspace}}/exit_with_error.sh" || EXIT_CODE=$?
+        if [[ "EXIT_CODE" != "0" ]]; then
+          echo "::warning:: Previous step failed!"
+          echo "::error:: Previous step failed!"
+          # exit 0
+        fi
+
     - name: Setup Ninja
       if: ${{ matrix.cmake_generator == 'Ninja' }}
       uses: seanmiddleditch/gha-setup-ninja@master
