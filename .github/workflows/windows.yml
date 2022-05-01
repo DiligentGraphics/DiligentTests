@@ -26,7 +26,7 @@ jobs:
     - name: Failure Test
       shell: bash
       run: |
-        chmod +x ./exit_with_error.sh
+        chmod +x ./pipe_error.sh
         EXIT_CODE=0
         "${{github.workspace}}/exit_with_error.sh" || EXIT_CODE=$?
         if [[ "EXIT_CODE" != "0" ]]; then
