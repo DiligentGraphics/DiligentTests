@@ -79,16 +79,19 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: recursive
+        path:       DiligentTests
 
-    - name: Clone DiligentEngine
+    - name: Clone DiligentCore
       uses: actions/checkout@v2
       with:
-        repository: 'DiligentGraphics/DiligentEngine'
-        path:       DiligentEngine
+        repository: 'DiligentGraphics/DiligentCore'
+        path:       DiligentCore
+        #ref:        38161922fe8457d1e505274d69c75c5c7ba84b63
 
     - uses: codespell-project/actions-codespell@master
       with:
         check_filenames: true
-        ignore_words_list: lod
-        #skip: ./DiligentSamples/ThirdParty,./DiligentSamples/Samples/Asteroids/SDK,*.gltf
-        path: ./DiligentEngine
+        #ignore_words_list: lod
+        #ignore_words_file: ./DiligentCore/.github/.codespellignore
+        skip: ./DiligentTests/ThirdParty
+        path: ./DiligentTests

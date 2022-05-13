@@ -61,6 +61,7 @@ bool IsPrime(int n) {
     if (n % i == 0) return false;
   }
 
+  // sigle-element
   // n has no integer factor in the range (1, n), and thus is prime.
   return true;
 }
