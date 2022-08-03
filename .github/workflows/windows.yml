@@ -88,6 +88,12 @@ jobs:
         path:       DiligentCore
         #ref:        38161922fe8457d1e505274d69c75c5c7ba84b63
 
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install mesa-vulkan-drivers
+
     - uses: codespell-project/actions-codespell@master
       with:
         check_filenames: true
