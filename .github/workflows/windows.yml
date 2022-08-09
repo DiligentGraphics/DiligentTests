@@ -18,6 +18,13 @@ jobs:
     name: Win10 -> ${{ matrix.toolset }}, ${{ matrix.config }}
 
     steps:
+    - name: Test Cmd
+      shell: cmd
+      env:
+        TEST_ENV_VAR: TestTestTest
+      run: echo %TEST_ENV_VAR%
+
+
     - name: Clone DiligentTests
       uses: actions/checkout@v2
       with:
