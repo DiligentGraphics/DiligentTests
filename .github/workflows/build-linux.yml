@@ -1,0 +1,134 @@
+name: Linux build
+
+on: [push, pull_request]
+
+jobs:
+  precheks:
+    runs-on: ubuntu-20.04
+    name:    Disk Cleanup Test
+
+    steps:
+    - name: Clean Disk
+      uses: DiligentGraphics/github-action/clean-disk-ubuntu@dev
+
+    #- name: Clean Disk Space
+    #  shell: bash
+    #  run: |
+    #    df -h
+    #    ANDROID_NDK_DIR=/usr/local/lib/android/sdk/ndk
+    #    ls $ANDROID_NDK_DIR
+    #    for dir in $ANDROID_NDK_DIR/* ; do
+    #      if [ "${dir%/}" != "$ANDROID_NDK_DIR/27.0.12077973" ]; then
+    #        echo "Removing $dir"
+    #        rm -rf "$dir"
+    #      fi
+    #    done
+    #    ls $ANDROID_NDK_DIR
+    #    df -h
+    #    # Remove unused tools and packages
+
+    #- name: Clean Disk Space
+    #  shell: bash
+    #  run: |
+    #    # Remove unused tools and packages
+    #    
+    #    # Remove .NET
+    #    echo 
+    #    echo 
+    #    echo Opt
+    #    #ls  -lh /opt
+    #    du -sh /opt/* | sort -h
+    #
+    #    echo 
+    #    echo 
+    #    echo usr-share
+    #    #ls  -lh /usr/share
+    #    du -sh /usr/share/* | sort -h
+    #
+    #    df -h
+    #    ls /usr/share/dotnet
+    #    sudo rm -rf /usr/share/dotnet || echo "::warning::Failed to remove .NET"
+    #    echo 
+    #    echo 
+    #    echo "After .NET"
+    #    df -h
+    #
+    #    # Remove Swift
+    #    sudo rm -rf /usr/share/swift || echo "::warning::Failed to remove Swift"
+    #    echo 
+    #    echo 
+    #    echo "After SWIFT"
+    #    df -h
+    #
+    #
+    #    # Remove CodeQL Action Bundles
+    #    ls /opt/hostedtoolcache/CodeQL
+    #    sudo rm -rf /opt/hostedtoolcache/CodeQL || echo "::warning::Failed to remove CodeQL Action Bundles"
+    #    echo 
+    #    echo 
+    #    echo "After CodeQL:"
+    #    df -h
+    #
+    #    sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+    #    echo 
+    #    echo 
+    #    echo "Tool Cache:"
+    #    df -h
+    #
+    #    ls /usr/local/lib/android/sdk/ndk/
+    #
+    #    # Remove Unused NDKs
+    #    #ANDROID_NDK_DIR=/usr/local/lib/android/sdk/ndk
+    #    #for dir in $ANDROID_NDK_DIR ; do
+    #    #  if [ "${dir%/}" != "$ANDROID_NDK_DIR/27.0.12077973" ]; then
+    #    #    rm -rf "$dir"
+    #    #  fi
+    #    #done
+    #    #echo 
+    #    #echo 
+    #    #echo "After Android NDK:"
+    #    #df -h
+    #
+    #
+    #    # Remove cached Docker images
+    #    sudo docker image prune --all --force || echo "::warning::Failed to remove Docker images"
+    #    echo 
+    #    echo 
+    #    echo "Free space:"
+    #    df -h
+    #
+    #
+    #    #1.2 GB
+    #    sudo apt-get remove -y '^aspnetcore-.*' # || echo "::warning::The command [sudo apt-get remove -y '^aspnetcore-.*'] failed to complete successfully. Proceeding..."
+    #
+    #
+    #    sudo apt-get remove -y '^dotnet-.*' --fix-missing # || echo "::warning::The command [sudo apt-get remove -y '^dotnet-.*' --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 0.8 GB
+    #    sudo apt-get remove -y '^llvm-.*' --fix-missing # || echo "::warning::The command [sudo apt-get remove -y '^llvm-.*' --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 0.3 GB
+    #    sudo apt-get remove -y 'php.*' --fix-missing # || echo "::warning::The command [sudo apt-get remove -y 'php.*' --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 0.5 GB
+    #    sudo apt-get remove -y '^mongodb-.*' --fix-missing # || echo "::warning::The command [sudo apt-get remove -y '^mongodb-.*' --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 0.3 GB
+    #    sudo apt-get remove -y '^mysql-.*' --fix-missing # || echo "::warning::The command [sudo apt-get remove -y '^mysql-.*' --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 2 GB
+    #    sudo apt-get remove -y azure-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri --fix-missing || echo "::warning::The command [sudo apt-get remove -y azure-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 0.6 GB
+    #    sudo apt-get remove -y google-cloud-sdk --fix-missing # || echo "::debug::The command [sudo apt-get remove -y google-cloud-sdk --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    # 0.4 GB
+    #    sudo apt-get remove -y google-cloud-cli --fix-missing # || echo "::debug::The command [sudo apt-get remove -y google-cloud-cli --fix-missing] failed to complete successfully. Proceeding..."
+    #
+    #    sudo apt-get autoremove -y # || echo "::warning::The command [sudo apt-get autoremove -y] failed to complete successfully. Proceeding..."
+    #    sudo apt-get clean # || echo "::warning::The command [sudo apt-get clean] failed to complete successfully. Proceeding..."
+    #
+    #    echo 
+    #    echo 
+    #    echo "Free space:"
+    #    df -h
