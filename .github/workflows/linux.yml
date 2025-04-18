@@ -1,0 +1,20 @@
+name: Linux
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Ubuntu -> Build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Checkout Diligent Engine
+      uses: actions/checkout@v4
+      with:
+        repository: DiligentGraphics/DiligentEngine
+        path:       DiligentEngine
+        submodules: true
