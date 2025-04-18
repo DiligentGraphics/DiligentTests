@@ -18,3 +18,13 @@ jobs:
         repository: DiligentGraphics/DiligentEngine
         path:       DiligentEngine
         submodules: true
+
+    - name: Install Doxygen
+      shell: bash
+      run: |
+        DOXYGEN_VERSION=1.13.2
+        wget https://doxygen.nl/files/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz
+        tar -xzf doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz
+        sudo cp -r doxygen-$DOXYGEN_VERSION/bin/* /usr/local/bin/
+        rm -rf doxygen-$DOXYGEN_VERSION*
+        doxygen --version
