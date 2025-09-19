@@ -33,6 +33,7 @@ before_build:
   #- dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64" || exit /b 0
   #- dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64" || exit /b 0
 
-  - dir "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64" || exit /b 0
+  - dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\ucrt\x64" || exit /b 0
+  - dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64" || exit /b 0
 
   #- cmake -S . -B ./build -G "Visual Studio 16 2019" -A x64
