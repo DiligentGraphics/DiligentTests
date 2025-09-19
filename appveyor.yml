@@ -8,6 +8,15 @@ install:
   # Run the SDK installer silently to install the desired components
   # Modify the /features option to include only the components you need
   #- cmd: C:\temp\winsdksetup.exe /norestart /features OptionId.DesktopCppx64
+  - ps: |
+      $url = "https://go.microsoft.com/fwlink/?linkid=2331960"
+      $out = "C:\Temp\winsdksetup.exe"
+      New-Item -ItemType Directory -Force -Path C:\Temp | Out-Null
+      Write-Host "Downloading Windows SDK installer..."
+      Invoke-WebRequest -Uri $url -OutFile $out
+      Write-Host "Installing Windows SDK silently..."
+      & $out /quiet /norestart | Out-Null
+      if ($LASTEXITCODE -ne 0) { throw "Windows SDK installer failed with exit code $LASTEXITCODE" }
 
 before_build:
   - dir "C:\Program Files (x86)\Windows Kits\10\Include" || exit /b 0
