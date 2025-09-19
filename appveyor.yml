@@ -3,20 +3,24 @@ image:
 
 install:
   # Download the Windows SDK 17763 installer
-  - ps: Invoke-WebRequest -Uri "https://download.microsoft.com/download/6/4/3/643A4705-728F-4D2A-8973-207E59D7713C/winsdksetup.exe" -OutFile "C:\temp\winsdksetup.exe"
+  #- ps: Invoke-WebRequest -Uri "https://download.microsoft.com/download/6/4/3/643A4705-728F-4D2A-8973-207E59D7713C/winsdksetup.exe" -OutFile "C:\temp\winsdksetup.exe"
 
   # Run the SDK installer silently to install the desired components
   # Modify the /features option to include only the components you need
-  - cmd: C:\temp\winsdksetup.exe /norestart /features OptionId.DesktopCppx64
+  #- cmd: C:\temp\winsdksetup.exe /norestart /features OptionId.DesktopCppx64
 
 before_build:
-  - dir "C:\Program Files (x86)\Windows Kits\10\Include" 2>nul
+  - dir "C:\Program Files (x86)\Windows Kits\10\Include" || exit /b 0
+  - dir "C:\Program Files (x86)\Windows Kits\10\Lib" || exit /b 0
+  - dir "C:\Program Files (x86)\Windows Kits\10\bin" || exit /b 0
 
-  - dir "C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0"
+  - dir "C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0" || exit /b 0
+  - dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0" || exit /b 0
+  - dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0" || exit /b 0
 
-  - dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\ucrt\x64"
-  - dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\um\x64"
+  #- dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\ucrt\x64" || exit /b 0
+  #- dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\um\x64" || exit /b 0
 
-  - dir "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64"
+  - dir "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64" || exit /b 0
 
-  - cmake -S . -B ./build -G "Visual Studio 16 2019" -A x64
+  #- cmake -S . -B ./build -G "Visual Studio 16 2019" -A x64
