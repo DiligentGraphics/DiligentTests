@@ -9,14 +9,35 @@ install:
   # Modify the /features option to include only the components you need
   #- cmd: C:\temp\winsdksetup.exe /norestart /features OptionId.DesktopCppx64
   - ps: |
-      $url = "https://go.microsoft.com/fwlink/?linkid=2331960"
-      $out = "C:\Temp\winsdksetup.exe"
-      New-Item -ItemType Directory -Force -Path C:\Temp | Out-Null
-      Write-Host "Downloading Windows SDK installer..."
-      Invoke-WebRequest -Uri $url -OutFile $out
-      Write-Host "Installing Windows SDK..."
-      & $out /norestart | Out-Null
-      if ($LASTEXITCODE -ne 0) { throw "Windows SDK installer failed with exit code $LASTEXITCODE" }
+      $url  = "https://go.microsoft.com/fwlink/?linkid=2331960"
+      $out  = "C:\Temp\winsdksetup.exe"
+      $temp = "C:\Temp"
+
+      New-Item -ItemType Directory -Force -Path $temp | Out-Null
+
+      Write-Host "Downloading Windows SDK from $url ..."
+      try {
+        Invoke-WebRequest -Uri $url -OutFile $out -UseBasicParsing -ErrorAction Stop
+      }
+      catch {
+        Write-Error "Download failed: $($_.Exception.Message)"
+        exit 1
+      }
+
+      if (-not (Test-Path $out)) {
+        Write-Error "Download did not produce $out"
+        exit 1
+      }
+
+      Write-Host "Installing Windows SDK silently..."
+      & $out /quiet /norestart
+      if ($LASTEXITCODE -ne 0) {
+        Write-Error "Windows SDK installer failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+      }
+      else {
+        Write-Host "Windows SDK installed successfully."
+      }
 
 before_build:
   - dir "C:\Program Files (x86)\Windows Kits\10\Include" || exit /b 0
