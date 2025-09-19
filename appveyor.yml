@@ -14,8 +14,8 @@ install:
       New-Item -ItemType Directory -Force -Path C:\Temp | Out-Null
       Write-Host "Downloading Windows SDK installer..."
       Invoke-WebRequest -Uri $url -OutFile $out
-      Write-Host "Installing Windows SDK silently..."
-      & $out /quiet /norestart | Out-Null
+      Write-Host "Installing Windows SDK..."
+      & $out /norestart | Out-Null
       if ($LASTEXITCODE -ne 0) { throw "Windows SDK installer failed with exit code $LASTEXITCODE" }
 
 before_build:
