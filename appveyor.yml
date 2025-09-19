@@ -1,6 +1,14 @@
 image:
 - Visual Studio 2019
 
+install:
+  # Download the Windows SDK 17763 installer
+  - ps: Invoke-WebRequest -Uri "https://download.microsoft.com/download/6/4/3/643A4705-728F-4D2A-8973-207E59D7713C/winsdksetup.exe" -OutFile "C:\temp\winsdksetup.exe"
+
+  # Run the SDK installer silently to install the desired components
+  # Modify the /features option to include only the components you need
+  - cmd: C:\temp\winsdksetup.exe /norestart /features OptionId.DesktopCppx64
+
 before_build:
   - dir "C:\Program Files (x86)\Windows Kits\10\Include" 2>nul
 
